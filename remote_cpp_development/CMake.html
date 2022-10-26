@@ -1,0 +1,1177 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="小糖不想吃糖了 - 关注深度学习、C++、嵌入式">
+      
+      
+      
+        <link rel="canonical" href="https://www.ttlarval.org/remote_cpp_development/CMake.html">
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
+    
+    
+      
+        <title>编译 C++ 项目必备 CMake - TTLarva</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.20d9efc8.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#02a6f2">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="light-blue" data-md-color-accent="light-blue">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#c-cmake" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../index.html" title="TTLarva" class="md-header__button md-logo" aria-label="TTLarva" data-md-component="logo">
+      
+  <img src="../assets/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            TTLarva
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              编译 C++ 项目必备 CMake
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/ttttLarva/Larva" title="前往仓库" class="md-source"
+  data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ttlarva
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../index.html" class="md-tabs__link">
+      首页
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../github/01_how_to_pr.html" class="md-tabs__link">
+        一起学GitHub
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../learn_cpp/01_rvalue_ref.html" class="md-tabs__link">
+        研究 C++ 新语法
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="remote_ssh.html" class="md-tabs__link md-tabs__link--active">
+        C++ 开发工具集锦
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cuda_program/01_what_is_cuda.html" class="md-tabs__link">
+        学习 CUDA 编程
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="TTLarva" class="md-nav__button md-logo" aria-label="TTLarva" data-md-component="logo">
+      
+  <img src="../assets/logo.svg" alt="logo">
+
+    </a>
+    TTLarva
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/ttttLarva/Larva" title="前往仓库" class="md-source"
+  data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ttlarva
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        首页
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          一起学GitHub
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="一起学GitHub" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          一起学GitHub
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/01_how_to_pr.html" class="md-nav__link">
+        如何提交 PR
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/02_learn_from_pr.html" class="md-nav__link">
+        如何通过 PR 学习
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/03_SSH_for_github.html" class="md-nav__link">
+        github SSH免密码登录设置
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/04_beauty_code.html" class="md-nav__link">
+        美化代码工具分享
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/05_get_started_with_Markdown.html" class="md-nav__link">
+        快速上手 Markdown
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/06_Mkdocs.html" class="md-nav__link">
+        MkDocs 工具使用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/07_GitHub_Pages.html" class="md-nav__link">
+        GitHub Pages 的生成和使用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/08_GitHub_Actions.html" class="md-nav__link">
+        GitHub Actions 介绍 & 使用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/09_merge_conflicts.html" class="md-nav__link">
+        解决 Git 冲突 Merge Conflicts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../github/10_git_rebase.html" class="md-nav__link">
+        删除指定 commit 小妙招 git rebase
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          研究 C++ 新语法
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="研究 C++ 新语法" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          研究 C++ 新语法
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/01_rvalue_ref.html" class="md-nav__link">
+        右值引用
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/02_forward.html" class="md-nav__link">
+        完美转发
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/03_varadic_template.html" class="md-nav__link">
+        可变参模板
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/04_singleton.html" class="md-nav__link">
+        单例模式
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/05_using_against_typedef.html" class="md-nav__link">
+        类型别名：从 typedef 到 using
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/06_functor.html" class="md-nav__link">
+        仿函数
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/07_complie_link_macro.html" class="md-nav__link">
+        编译链接和宏本质
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/08_template.html" class="md-nav__link">
+        模板 template
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/09_template_special.html" class="md-nav__link">
+        模板特例
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/11_template_sfinae.html" class="md-nav__link">
+        搞懂 SFINAE
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/012_enable_if.html" class="md-nav__link">
+        enable_if 新标准
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/13_enable_if_redefine_mistake.html" class="md-nav__link">
+        enable_if 的重定义错误
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learn_cpp/014_materials.html" class="md-nav__link">
+        模板元编程
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          C++ 开发工具集锦
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="C++ 开发工具集锦" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          C++ 开发工具集锦
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="remote_ssh.html" class="md-nav__link">
+        VS Code 插件 Remote SSH
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="conda.html" class="md-nav__link">
+        使用包管理工具 Conda
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          编译 C++ 项目必备 CMake
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="CMake.html" class="md-nav__link md-nav__link--active">
+        编译 C++ 项目必备 CMake
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cmake" class="md-nav__link">
+    CMake 项目特点
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cmake_1" class="md-nav__link">
+    为什么需要 CMake
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cmake_2" class="md-nav__link">
+    CMake 示例
+  </a>
+  
+    <nav class="md-nav" aria-label="CMake 示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linux-cmake" class="md-nav__link">
+    Linux 下使用 CMake
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-cmake" class="md-nav__link">
+    Windows 下使用 CMake
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oneflow" class="md-nav__link">
+    实战编译 OneFlow
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Clangd.html" class="md-nav__link">
+        clangd 帮助打造 Linux 下完美 C++ IDE
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          学习 CUDA 编程
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="学习 CUDA 编程" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          学习 CUDA 编程
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cuda_program/01_what_is_cuda.html" class="md-nav__link">
+        CUDA 是什么
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cmake" class="md-nav__link">
+    CMake 项目特点
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cmake_1" class="md-nav__link">
+    为什么需要 CMake
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cmake_2" class="md-nav__link">
+    CMake 示例
+  </a>
+  
+    <nav class="md-nav" aria-label="CMake 示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linux-cmake" class="md-nav__link">
+    Linux 下使用 CMake
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows-cmake" class="md-nav__link">
+    Windows 下使用 CMake
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oneflow" class="md-nav__link">
+    实战编译 OneFlow
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/ttttLarva/Larva/blob/master/docs/remote_cpp_development/CMake.md" title="编辑此页" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="c-cmake">编译 C++ 项目必备 CMake<a class="headerlink" href="#c-cmake" title="Permanent link">&para;</a></h1>
+<p><img alt="🌏" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f30f.svg" title=":earth_asia:" /> <strong>Bilibili视频传送门：</strong> <a href="https://www.bilibili.com/video/BV1Zq4y13777?spm_id_from=333.999.0.0">远程开发 C++ 003_CMake</a> <img alt="🌏" class="twemoji" src="https://twemoji.maxcdn.com/v/latest/svg/1f30f.svg" title=":earth_asia:" /></p>
+<p>本篇文章将和大家聊一聊编译 C++ 项目的必备工具 CMake。现在几乎所有的大型的开源的 C++ 项目，都会使用 CMake 来做构建系统。 </p>
+<p>比如编译基础设置 <a href="https://github.com/llvm/llvm-project">LLVM</a>，高性能异步 IO 库 <a href="https://github.com/libuv/libuv">libuv</a>，<a href="https://github.com/boostorg/boost">boost 库</a>，当然还有分布式深度学习框架 <a href="https://github.com/Oneflow-Inc/oneflow">OneFlow</a>。</p>
+<h3 id="cmake">CMake 项目特点<a class="headerlink" href="#cmake" title="Permanent link">&para;</a></h3>
+<p>要识别 CMake 项目特别简单，那就是这个项目下一定有名为 CMakeLists.txt 的文件</p>
+<p>本文的结构如下：</p>
+<ul>
+<li>为什么需要 CMake</li>
+<li>CMake 示例</li>
+<li>实战编译 OneFlow</li>
+</ul>
+<h2 id="cmake_1">为什么需要 CMake<a class="headerlink" href="#cmake_1" title="Permanent link">&para;</a></h2>
+<p>简单而言，CMake 可以帮助跨平台来编译工程。</p>
+<p>比如说大家在 Windoes 上可能会使用 Visual Studio，在 Mac 上可能会使用 XCode，在 Linux 系统下会使用 Makefile 来编译一个 C++ 工程。如果同一套 C++ 代码在不同的构建系统下，都需要重新去设置一遍，是非常不方便的。</p>
+<p>而 CMake 它就可以解决这类问题，CMake 通过读取 CMakeLists.txt 的配置文件，来根据当前的平台构建相应的 C++ 工程。</p>
+<p><img alt="CMake" src="CMake_pics/Xnip2022-05-12_00-03-45.jpg" /></p>
+<h2 id="cmake_2">CMake 示例<a class="headerlink" href="#cmake_2" title="Permanent link">&para;</a></h2>
+<p>这里是一个简单的 CMake 的例子：</p>
+<div class="highlight"><pre><span></span><code>cmake_minimum_required(VERSIOIN 3.14)  #设置CMake最小版本 
+project (cmake_example)  #设置工程名
+add_executable(cmake_example main.cop ui.cpp logic.cpp)  #生成可执行文件
+</code></pre></div>
+<p>这个 CMakeLists 是项目设置的一个配置文件，第一行是设置 CMake 的最小版本，第二行是设置工程名，大家根据自己的喜好设置就行，第三行是生成的可执行文件名，后面的是依赖的 cpp 名。</p>
+<p>接下来文章将向大家展示在 Linux 和 Windows 系统下使用 CMake 来生成不同的工程。</p>
+<h3 id="linux-cmake">Linux 下使用 CMake<a class="headerlink" href="#linux-cmake" title="Permanent link">&para;</a></h3>
+<p>首先，需要创建一个 build 目录，在 terminal 输入 <code>mkdir build</code>，目的是为了将 CMake 后生成的所有文件，所有内容都放到这个 build 目录下。</p>
+<p>然后切换到 build 目录，terminal 输入 <code>cd build</code>。</p>
+<p>接着使用 CMake 命令，后面接 CMakeLists 所在的目录，也就是它的上一级目录加两个点 <code>cmake ..</code>。</p>
+<p>然后在 build 目录下就生成了 MakeFile，接着 make 一下，输入 <code>make</code>。可以发现在 build 目录下就生成了 cmake_example 这个可执行的文件。</p>
+<p>接着执行一下，输入 <code>./cmake_example</code>，就可以打印出要的结果。</p>
+<p>CMake 其实就是通过读取 CMakelists.txt 来生成对应工程的，也可以在 CMake 时传递一些变量值来设置工程属性，比如刚刚编译的工程，它是一个 Release 版本的，是没有调试信息的。</p>
+<p>关于 CMake 更多知识点，可以使用 man 命令来查看一下，<code>man cmake</code>。</p>
+<h3 id="windows-cmake">Windows 下使用 CMake<a class="headerlink" href="#windows-cmake" title="Permanent link">&para;</a></h3>
+<p>首先打开 VS 的交叉编译工具，切换到工程目录下，<code>cd D:\tmp_code\cmake_example</code>。</p>
+<p>输入 <code>dir</code>，然后使用 <code>mkdir build</code> 命令，创建 build 目录。</p>
+<p>使用 <code>cd build</code> 切换到 build 目录。</p>
+<p>然后使用 CMake 命令 <code>cmake ..</code>，就可以在 build 目录下就生成一个 sln 文件。</p>
+<h2 id="oneflow">实战编译 OneFlow<a class="headerlink" href="#oneflow" title="Permanent link">&para;</a></h2>
+<p>像 OneFlow 这样大型的系统，它的 CMake 配置文件往往是非常复杂的，想要看懂里面的源码，了解如何配置，往往是不太容易的。</p>
+<p>但是这样的项目，它的 Readme 一般都会附上说明，仔细看 Readme 就行了。 </p>
+<p>OneFlow 的 Readme 文件，它描述了该去哪里找怎么编译 OneFlow。</p>
+<p>点开这个<a href="https://github.com/Oneflow-Inc/conda-env">链接</a>，然后一步一步地编译 OneFlow。</p>
+<p>编译 OneFlow 需要使用到 conda，具体怎么安装，在上一篇文章 <a href="conda.html">Conda</a> 中。</p>
+<p>首先，需要构建编译环境：</p>
+<p>使用 <code>git clone https://github.com/Oneflow-Inc/conda-env.git</code> 下载这一个编译环境包。</p>
+<p>输入 <code>cd conda-env</code> 来 cd 到这个环境包。</p>
+<p>输入 <code>conda env create -f=dev/gcc7/environment-v2.yml</code> 构建这一个环境</p>
+<p>最重要的一步，输入 <code>conda activate oneflow-dev-gcc7-v2</code> 和 <code>conda env config vars set CXXFLAGS="-fPIC"</code> 激活使用这个环境。</p>
+<p>在成功激活这个环境后，就可以切换到 OneFlow 源码目录下，依次输入 <code>cd..</code>， <code>ls</code> 和 <code>cd oneflow/</code>。</p>
+<p>接着，使用 CMake 来构建 OneFlow：</p>
+<p>输入 <code>mkdir build</code> 来构建一个 build 目录，目的将生成的所有内容都放到 build 目录下。</p>
+<p>然后切换到 build 目录下，<code>cd build</code>。</p>
+<p>使用 CMake 指令 <code>cmake .. -C ../cmake/caches/cn/cuda.cmake \ -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda \ -DCUDNN_ROOT_DIR=/usr/local/cudnn</code> 进行构建。</p>
+<p>然后就会发现当前的 build 目录下生成了 MakeFile。</p>
+<p>接着就可以使用 <code>make -j$(nproc)</code> 来生成可执行文件了，第一次编译的话可能需要半个小时左右。</p>
+<p>先输入 <code>cd ..</code> 切换到上级目录，再接着使用 <code>source build/source.sh</code> 将 OneFlow 添加到 Python 的 path 中。</p>
+<p>最后，可以使用指令 <code>python3 -m oneflow --doctor</code> 来检查是否编译成功。</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            回到页面顶部
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      
+        
+        <a href="conda.html" class="md-footer__link md-footer__link--prev" aria-label="上一页: 使用包管理工具 Conda" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              使用包管理工具 Conda
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="Clangd.html" class="md-footer__link md-footer__link--next" aria-label="下一页: clangd 帮助打造 Linux 下完美 C++ IDE" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              clangd 帮助打造 Linux 下完美 C++ IDE
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; All Reserved
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\uff0c\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.8492ddcf.min.js"></script>
+      
+        <script src="../javascripts/config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
